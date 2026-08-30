@@ -1,13 +1,11 @@
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
 
-
 async function loadVocabulary() {
 
     try {
 
         const response = await fetch(CSV_URL);
-
         const csvText = await response.text();
 
         const rows = csvText.trim().split(/\r?\n/);
@@ -17,12 +15,12 @@ async function loadVocabulary() {
             const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
             return {
-                date: values[0]?.replace(/"/g, ""),
-                topic: values[1]?.replace(/"/g, ""),
-                german: values[2]?.replace(/"/g, ""),
-                english: values[3]?.replace(/"/g, ""),
-                plural: values[4]?.replace(/"/g, ""),
-                example: values[5]?.replace(/"/g, "")
+                date: values[0]?.replace(/"/g, "") || "",
+                topic: values[1]?.replace(/"/g, "") || "",
+                german: values[2]?.replace(/"/g, "") || "",
+                english: values[3]?.replace(/"/g, "") || "",
+                plural: values[4]?.replace(/"/g, "") || "",
+                example: values[5]?.replace(/"/g, "") || ""
             };
 
         });
@@ -43,7 +41,14 @@ function displayVocabulary(vocabulary) {
         document.getElementById("vocabulary-container");
 
     container.innerHTML = "";
-    document.getElementById("wordCount").textContent = vocabulary.length;
+
+    // Update word counter
+    const counter =
+        document.getElementById("wordCount");
+
+    if (counter) {
+        counter.textContent = vocabulary.length;
+    }
 
     vocabulary.forEach(word => {
 
