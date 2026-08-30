@@ -4,30 +4,36 @@ const CSV_URL =
 
 async function loadVocabulary() {
 
-    const response = await fetch(CSV_URL);
+    try {
 
-    const csvText = await response.text();
+        const response = await fetch(CSV_URL);
 
-    const rows = csvText.trim().split("\n");
+        const csvText = await response.text();
 
-    const headers = rows[0].split(",");
+        const rows = csvText.trim().split(/\r?\n/);
 
-    const vocabulary = rows.slice(1).map(row => {
+        const vocabulary = rows.slice(1).map(row => {
 
-        const values = row.split(",");
+            const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
-        return {
-            date: values[0],
-            topic: values[1],
-            german: values[2],
-            english: values[3],
-            plural: values[4],
-            example: values[5]
-        };
+            return {
+                date: values[0]?.replace(/"/g, ""),
+                topic: values[1]?.replace(/"/g, ""),
+                german: values[2]?.replace(/"/g, ""),
+                english: values[3]?.replace(/"/g, ""),
+                plural: values[4]?.replace(/"/g, ""),
+                example: values[5]?.replace(/"/g, "")
+            };
 
-    });
+        });
 
-    displayVocabulary(vocabulary);
+        displayVocabulary(vocabulary);
+
+    } catch (error) {
+
+        console.error("Vocabulary loading error:", error);
+
+    }
 }
 
 
