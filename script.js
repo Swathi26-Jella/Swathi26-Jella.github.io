@@ -5,9 +5,95 @@ const CSV_URL =
 let allVocabulary = [];
 
 
-// =========================
-// LOAD VOCABULARY FROM CSV
-// =========================
+// ===============================
+// CSV PARSER
+// ===============================
+
+function parseCSV(text) {
+
+    const rows = [];
+
+    let row = [];
+
+    let value = "";
+
+    let insideQuotes = false;
+
+
+    for (let i = 0; i < text.length; i++) {
+
+        const char = text[i];
+
+        const nextChar = text[i + 1];
+
+
+        if (char === '"' && insideQuotes && nextChar === '"') {
+
+            value += '"';
+
+            i++;
+
+        }
+
+        else if (char === '"') {
+
+            insideQuotes = !insideQuotes;
+
+        }
+
+        else if (char === "," && !insideQuotes) {
+
+            row.push(value.trim());
+
+            value = "";
+
+        }
+
+        else if ((char === "\n" || char === "\r") && !insideQuotes) {
+
+            if (char === "\r" && nextChar === "\n") {
+                i++;
+            }
+
+            row.push(value.trim());
+
+            value = "";
+
+            if (row.some(cell => cell !== "")) {
+                rows.push(row);
+            }
+
+            row = [];
+
+        }
+
+        else {
+
+            value += char;
+
+        }
+
+    }
+
+
+    if (value !== "" || row.length > 0) {
+
+        row.push(value.trim());
+
+        rows.push(row);
+
+    }
+
+
+    return rows;
+
+}
+
+
+
+// ===============================
+// LOAD VOCABULARY
+// ===============================
 
 async function loadVocabulary() {
 
@@ -17,28 +103,27 @@ async function loadVocabulary() {
 
         const csvText = await response.text();
 
-        const rows = csvText.trim().split(/\r?\n/);
 
+        const rows = parseCSV(csvText);
+
+
+        // Skip header row
 
         allVocabulary = rows.slice(1).map(row => {
 
-            const values =
-                row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-
-
             return {
 
-                date: values[0]?.replace(/^"|"$/g, "") || "",
+                date: row[0] || "",
 
-                topic: values[1]?.replace(/^"|"$/g, "") || "",
+                topic: row[1] || "",
 
-                german: values[2]?.replace(/^"|"$/g, "") || "",
+                german: row[2] || "",
 
-                english: values[3]?.replace(/^"|"$/g, "") || "",
+                english: row[3] || "",
 
-                plural: values[4]?.replace(/^"|"$/g, "") || "",
+                plural: row[4] || "",
 
-                example: values[5]?.replace(/^"|"$/g, "") || ""
+                example: row[5] || ""
 
             };
 
@@ -47,12 +132,12 @@ async function loadVocabulary() {
 
         displayVocabulary(allVocabulary);
 
-        updateWordCount(allVocabulary);
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
-        console.error("Vocabulary loading error:", error);
+        console.error("Error loading vocabulary:", error);
 
     }
 
@@ -60,25 +145,14 @@ async function loadVocabulary() {
 
 
 
-// =========================
-// DISPLAY VOCABULARY
-// =========================
+// ===============================
+// DISPLAY WORDS
+// ===============================
 
 function displayVocabulary(vocabulary) {
 
     const container =
         document.getElementById("vocabulary-container");
-
-
-    if (!container) {
-
-        console.error(
-            "vocabulary-container not found in index.html"
-        );
-
-        return;
-
-    }
 
 
     container.innerHTML = "";
@@ -133,19 +207,20 @@ function displayVocabulary(vocabulary) {
 
 
 
-// =========================
+// ===============================
 // WORD COUNT
-// =========================
+// ===============================
 
 function updateWordCount(vocabulary) {
 
-    const count =
+    const wordCount =
         document.getElementById("wordCount");
 
 
-    if (count) {
+    if (wordCount) {
 
-        count.textContent = vocabulary.length;
+        wordCount.textContent =
+            vocabulary.length;
 
     }
 
@@ -153,9 +228,9 @@ function updateWordCount(vocabulary) {
 
 
 
-// =========================
+// ===============================
 // 📚 ALLE WÖRTER
-// =========================
+// ===============================
 
 function showAll() {
 
@@ -165,32 +240,119 @@ function showAll() {
 
 
 
-// =========================
+// ===============================
 // 🧠 THEMEN
-// =========================
+// ===============================
 
 function showTopics() {
 
-    alert("Themen-Funktion kommt als nächster Schritt.");
+    const container =
+        document.getElementById("vocabulary-container");
+
+
+    container.innerHTML = "";
+
+
+    const topics =
+        [...new Set(
+            allVocabulary.map(word => word.topic)
+        )];
+
+
+    topics.forEach(topic => {
+
+        const button =
+            document.createElement("button");
+
+
+        button.className = "topic-button";
+
+        button.textContent =
+            "🧠 " + topic;
+
+
+        button.onclick = function () {
+
+            const filtered =
+                allVocabulary.filter(
+                    word => word.topic === topic
+                );
+
+
+            displayVocabulary(filtered);
+
+        };
+
+
+        container.appendChild(button);
+
+    });
+
+
+    updateWordCount([]);
+
 
 }
 
 
 
-// =========================
+// ===============================
 // 📅 TAGE
-// =========================
+// ===============================
 
 function showDays() {
 
-    alert("Tage-Funktion kommt als nächster Schritt.");
+    const container =
+        document.getElementById("vocabulary-container");
+
+
+    container.innerHTML = "";
+
+
+    const dates =
+        [...new Set(
+            allVocabulary.map(word => word.date)
+        )];
+
+
+    dates.forEach(date => {
+
+        const button =
+            document.createElement("button");
+
+
+        button.className = "day-button";
+
+        button.textContent =
+            "📅 " + date;
+
+
+        button.onclick = function () {
+
+            const filtered =
+                allVocabulary.filter(
+                    word => word.date === date
+                );
+
+
+            displayVocabulary(filtered);
+
+        };
+
+
+        container.appendChild(button);
+
+    });
+
+
+    updateWordCount([]);
 
 }
 
 
 
-// =========================
-// START
-// =========================
+// ===============================
+// START WEBSITE
+// ===============================
 
 loadVocabulary();
