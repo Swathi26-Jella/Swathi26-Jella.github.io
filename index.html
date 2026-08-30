@@ -4,12 +4,10 @@
 <head>
     <meta charset="UTF-8">
 
-    <!-- Makes the website work properly on phones -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Deutsch Wortschatz</title>
 
-    <!-- Connect CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -41,7 +39,253 @@
     <main class="container">
 
 
-        <!-- SEARCH -->
+        <!-- =========================
+             ADD WORDS BUTTON
+        ========================== -->
+
+        <section class="add-section">
+
+            <button
+                class="add-button"
+                onclick="showAddWords()"
+            >
+                ➕ 5 neue Wörter hinzufügen
+            </button>
+
+        </section>
+
+
+        <!-- =========================
+             ADD WORDS FORM
+        ========================== -->
+
+        <section
+            id="addWordsForm"
+            class="add-words-form"
+            style="display: none;"
+        >
+
+            <h2>📚 5 neue Wörter hinzufügen</h2>
+
+            <!-- DATE -->
+
+            <label for="wordDate">
+                📅 Datum
+            </label>
+
+            <input
+                type="date"
+                id="wordDate"
+            >
+
+
+            <!-- TOPIC -->
+
+            <label for="wordTopic">
+                🧠 Thema
+            </label>
+
+            <input
+                type="text"
+                id="wordTopic"
+                placeholder="z. B. Debugging"
+            >
+
+
+            <!-- WORD TABLE -->
+
+            <div class="word-input-table">
+
+                <div class="table-header">
+                    <div>Deutsch</div>
+                    <div>English</div>
+                    <div>Plural</div>
+                    <div>Beispiel</div>
+                </div>
+
+
+                <!-- WORD 1 -->
+
+                <div class="word-row">
+
+                    <input
+                        type="text"
+                        id="german1"
+                        placeholder="z. B. der Parameter"
+                    >
+
+                    <input
+                        type="text"
+                        id="english1"
+                        placeholder="Parameter"
+                    >
+
+                    <input
+                        type="text"
+                        id="plural1"
+                        placeholder="Parameter"
+                    >
+
+                    <input
+                        type="text"
+                        id="example1"
+                        placeholder="Beispielsatz"
+                    >
+
+                </div>
+
+
+                <!-- WORD 2 -->
+
+                <div class="word-row">
+
+                    <input
+                        type="text"
+                        id="german2"
+                        placeholder="Deutsch"
+                    >
+
+                    <input
+                        type="text"
+                        id="english2"
+                        placeholder="English"
+                    >
+
+                    <input
+                        type="text"
+                        id="plural2"
+                        placeholder="Plural"
+                    >
+
+                    <input
+                        type="text"
+                        id="example2"
+                        placeholder="Beispielsatz"
+                    >
+
+                </div>
+
+
+                <!-- WORD 3 -->
+
+                <div class="word-row">
+
+                    <input
+                        type="text"
+                        id="german3"
+                        placeholder="Deutsch"
+                    >
+
+                    <input
+                        type="text"
+                        id="english3"
+                        placeholder="English"
+                    >
+
+                    <input
+                        type="text"
+                        id="plural3"
+                        placeholder="Plural"
+                    >
+
+                    <input
+                        type="text"
+                        id="example3"
+                        placeholder="Beispielsatz"
+                    >
+
+                </div>
+
+
+                <!-- WORD 4 -->
+
+                <div class="word-row">
+
+                    <input
+                        type="text"
+                        id="german4"
+                        placeholder="Deutsch"
+                    >
+
+                    <input
+                        type="text"
+                        id="english4"
+                        placeholder="English"
+                    >
+
+                    <input
+                        type="text"
+                        id="plural4"
+                        placeholder="Plural"
+                    >
+
+                    <input
+                        type="text"
+                        id="example4"
+                        placeholder="Beispielsatz"
+                    >
+
+                </div>
+
+
+                <!-- WORD 5 -->
+
+                <div class="word-row">
+
+                    <input
+                        type="text"
+                        id="german5"
+                        placeholder="Deutsch"
+                    >
+
+                    <input
+                        type="text"
+                        id="english5"
+                        placeholder="English"
+                    >
+
+                    <input
+                        type="text"
+                        id="plural5"
+                        placeholder="Plural"
+                    >
+
+                    <input
+                        type="text"
+                        id="example5"
+                        placeholder="Beispielsatz"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SAVE BUTTON -->
+
+            <button
+                class="save-button"
+                onclick="saveWords()"
+            >
+                💾 Wörter speichern
+            </button>
+
+
+            <!-- CANCEL BUTTON -->
+
+            <button
+                class="cancel-button"
+                onclick="hideAddWords()"
+            >
+                ❌ Abbrechen
+            </button>
+
+        </section>
+
+
+        <!-- =========================
+             SEARCH
+        ========================== -->
 
         <section class="search-section">
 
@@ -104,18 +348,13 @@
 
             <div id="vocabulary-container">
 
-                <!--
-                    vocabulary.js will put
-                    all your words here.
-                -->
-
             </div>
 
         </section>
 
 
         <!-- =========================
-             NO RESULTS MESSAGE
+             NO RESULTS
         ========================== -->
 
         <div
