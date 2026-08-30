@@ -26,8 +26,7 @@ const vocabulary = [
     {
         date: "24.07.2026",
         topic: "CAN & Communication",
-        german: "der Master",
-        english: "Master",
+        german: "der Master",b
         plural: "Master",
         example: "Der Master steuert die Kommunikation."
     },
@@ -1896,3 +1895,34 @@ const vocabulary = [
     }
 
 ];
+fetch(CSV_URL)
+    .then(response => response.text())
+    .then(csv => {
+
+        const rows = csv.split("\n").slice(1);
+
+        const sheetVocabulary = rows
+            .filter(row => row.trim() !== "")
+            .map(row => {
+
+                const columns = row.split(",");
+
+                return {
+                    date: columns[0]?.trim() || "",
+                    topic: columns[1]?.trim() || "",
+                    german: columns[2]?.trim() || "",
+                    english: columns[3]?.trim() || "",
+                    plural: columns[4]?.trim() || "",
+                    example: columns.slice(5).join(",").trim() || ""
+                };
+
+            });
+
+        vocabulary.push(...sheetVocabulary);
+
+        console.log("Vocabulary loaded:", vocabulary);
+
+    })
+    .catch(error => {
+        console.error("Could not load Google Sheet:", error);
+    });
