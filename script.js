@@ -43,6 +43,7 @@ function displayVocabulary(vocabulary) {
         document.getElementById("vocabulary-container");
 
     container.innerHTML = "";
+    document.getElementById("wordCount").textContent = vocabulary.length;
 
     vocabulary.forEach(word => {
 
