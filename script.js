@@ -1,6 +1,6 @@
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
-
+let allVocabulary = [];
 async function loadVocabulary() {
 
     try {
@@ -10,8 +10,7 @@ async function loadVocabulary() {
 
         const rows = csvText.trim().split(/\r?\n/);
 
-        const vocabulary = rows.slice(1).map(row => {
-
+        allVocabulary = rows.slice(1).map(row => {
             const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
             return {
@@ -25,7 +24,7 @@ async function loadVocabulary() {
 
         });
 
-        displayVocabulary(vocabulary);
+        displayVocabulary(allvocabulary);
 
     } catch (error) {
 
@@ -88,3 +87,6 @@ function displayVocabulary(vocabulary) {
 
 
 loadVocabulary();
+function showAll() {
+    displayVocabulary(allVocabulary);
+}
