@@ -1,84 +1,21 @@
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
+// ==========================================
+// GOOGLE SHEETS CSV URL
+// ==========================================
 
+const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
+
+
+// ==========================================
+// GLOBAL VOCABULARY
+// ==========================================
 
 let allVocabulary = [];
 
 
-// ===============================
-// CSV PARSER
-// ===============================
-
-function parseCSV(text) {
-
-    const rows = [];
-
-    let row = [];
-    let value = "";
-    let insideQuotes = false;
-
-
-    for (let i = 0; i < text.length; i++) {
-
-        const char = text[i];
-        const nextChar = text[i + 1];
-
-
-        if (char === '"' && insideQuotes && nextChar === '"') {
-
-            value += '"';
-            i++;
-
-        } else if (char === '"') {
-
-            insideQuotes = !insideQuotes;
-
-        } else if (char === "," && !insideQuotes) {
-
-            row.push(value.trim());
-            value = "";
-
-        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
-
-            if (char === "\r" && nextChar === "\n") {
-                i++;
-            }
-
-            row.push(value.trim());
-            value = "";
-
-            if (row.some(cell => cell !== "")) {
-                rows.push(row);
-            }
-
-            row = [];
-
-        } else {
-
-            value += char;
-
-        }
-
-    }
-
-
-    if (value !== "" || row.length > 0) {
-
-        row.push(value.trim());
-        rows.push(row);
-
-    }
-
-
-    return rows;
-
-}
-
-
-
-// ===============================
+// ==========================================
 // LOAD VOCABULARY
-// ===============================
+// ==========================================
 
 async function loadVocabulary() {
 
@@ -86,21 +23,41 @@ async function loadVocabulary() {
 
         const response = await fetch(CSV_URL);
 
+        if (!response.ok) {
+            throw new Error("Could not load Google Sheet");
+        }
+
         const csvText = await response.text();
 
-        const rows = parseCSV(csvText);
+
+        // Split CSV into lines
+        const lines = csvText.trim().split(/\r?\n/);
 
 
-        allVocabulary = rows.slice(1).map(row => ({
+        // Skip header row
+        allVocabulary = lines.slice(1).map(line => {
 
-            date: row[0] || "",
-            topic: row[1] || "",
-            german: row[2] || "",
-            english: row[3] || "",
-            plural: row[4] || "",
-            example: row[5] || ""
+            // Split CSV columns
+            const values = line.match(
+                /(".*?"|[^",]+)(?=\s*,|\s*$)/g
+            ) || [];
 
-        }));
+
+            return {
+
+                date: cleanValue(values[0]),
+                topic: cleanValue(values[1]),
+                german: cleanValue(values[2]),
+                english: cleanValue(values[3]),
+                plural: cleanValue(values[4]),
+                example: cleanValue(values[5])
+
+            };
+
+        });
+
+
+        console.log("Vocabulary loaded:", allVocabulary.length);
 
 
         displayVocabulary(allVocabulary);
@@ -108,17 +65,32 @@ async function loadVocabulary() {
 
     } catch (error) {
 
-        console.error("Error loading vocabulary:", error);
+        console.error("Vocabulary loading error:", error);
 
     }
 
 }
 
 
+// ==========================================
+// CLEAN CSV VALUE
+// ==========================================
 
-// ===============================
+function cleanValue(value) {
+
+    if (!value) return "";
+
+    return value
+        .replace(/^"|"$/g, "")
+        .replace(/""/g, '"')
+        .trim();
+
+}
+
+
+// ==========================================
 // DISPLAY VOCABULARY
-// ===============================
+// ==========================================
 
 function displayVocabulary(vocabulary) {
 
@@ -129,9 +101,11 @@ function displayVocabulary(vocabulary) {
         document.getElementById("no-results");
 
 
+    // Clear old content
     container.innerHTML = "";
 
 
+    // No results
     if (vocabulary.length === 0) {
 
         if (noResults) {
@@ -145,15 +119,18 @@ function displayVocabulary(vocabulary) {
     }
 
 
+    // Hide no results message
     if (noResults) {
         noResults.style.display = "none";
     }
 
 
+    // Create vocabulary cards
     vocabulary.forEach(word => {
 
         const card =
             document.createElement("div");
+
 
         card.className = "word-card";
 
@@ -169,7 +146,8 @@ function displayVocabulary(vocabulary) {
             </div>
 
             <div class="plural">
-                <strong>Plural:</strong> ${word.plural}
+                <strong>Plural:</strong>
+                ${word.plural}
             </div>
 
             <div class="example">
@@ -195,48 +173,108 @@ function displayVocabulary(vocabulary) {
 }
 
 
+// ==========================================
+// UPDATE WORD COUNT
+// ==========================================
 
-// ===============================
-// WORD COUNT
-// ===============================
-
-function updateWordCount(number) {
+function updateWordCount(count) {
 
     const wordCount =
         document.getElementById("wordCount");
 
+
     if (wordCount) {
 
-        wordCount.textContent = number;
+        wordCount.textContent = count;
 
     }
 
 }
 
 
+// ==========================================
+// 🔍 SEARCH
+// ==========================================
 
-// ===============================
-// 📚 ALLE WÖRTER
-// ===============================
-
-function showAll() {
+function searchVocabulary() {
 
     const searchInput =
         document.getElementById("search");
 
-    if (searchInput) {
-        searchInput.value = "";
+
+    const searchText =
+        searchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    // If empty → show all words
+    if (searchText === "") {
+
+        displayVocabulary(allVocabulary);
+
+        return;
+
     }
+
+
+    const filteredWords =
+        allVocabulary.filter(word => {
+
+            const german =
+                (word.german || "").toLowerCase();
+
+            const english =
+                (word.english || "").toLowerCase();
+
+            const plural =
+                (word.plural || "").toLowerCase();
+
+            const example =
+                (word.example || "").toLowerCase();
+
+            const topic =
+                (word.topic || "").toLowerCase();
+
+            const date =
+                (word.date || "").toLowerCase();
+
+
+            return (
+
+                german.includes(searchText) ||
+                english.includes(searchText) ||
+                plural.includes(searchText) ||
+                example.includes(searchText) ||
+                topic.includes(searchText) ||
+                date.includes(searchText)
+
+            );
+
+        });
+
+
+    displayVocabulary(filteredWords);
+
+}
+
+
+// ==========================================
+// 📚 ALLE WÖRTER
+// ==========================================
+
+function showAll() {
+
+    document.getElementById("search").value = "";
 
     displayVocabulary(allVocabulary);
 
 }
 
 
-
-// ===============================
+// ==========================================
 // 🧠 THEMEN
-// ===============================
+// ==========================================
 
 function showTopics() {
 
@@ -248,7 +286,9 @@ function showTopics() {
 
 
     const topics =
-        [...new Set(allVocabulary.map(word => word.topic))];
+        [...new Set(
+            allVocabulary.map(word => word.topic)
+        )];
 
 
     topics.forEach(topic => {
@@ -256,19 +296,22 @@ function showTopics() {
         const button =
             document.createElement("button");
 
+
         button.className = "topic-button";
 
-        button.textContent = "🧠 " + topic;
+        button.textContent =
+            "🧠 " + topic;
 
 
         button.onclick = function () {
 
-            const filtered =
+            const filteredWords =
                 allVocabulary.filter(word =>
                     word.topic === topic
                 );
 
-            displayVocabulary(filtered);
+
+            displayVocabulary(filteredWords);
 
         };
 
@@ -278,15 +321,15 @@ function showTopics() {
     });
 
 
-    updateWordCount(allVocabulary.length);
+    document.getElementById("no-results").style.display =
+        "none";
 
 }
 
 
-
-// ===============================
+// ==========================================
 // 📅 TAGE
-// ===============================
+// ==========================================
 
 function showDays() {
 
@@ -298,7 +341,9 @@ function showDays() {
 
 
     const dates =
-        [...new Set(allVocabulary.map(word => word.date))];
+        [...new Set(
+            allVocabulary.map(word => word.date)
+        )];
 
 
     dates.forEach(date => {
@@ -306,19 +351,22 @@ function showDays() {
         const button =
             document.createElement("button");
 
+
         button.className = "day-button";
 
-        button.textContent = "📅 " + date;
+        button.textContent =
+            "📅 " + date;
 
 
         button.onclick = function () {
 
-            const filtered =
+            const filteredWords =
                 allVocabulary.filter(word =>
                     word.date === date
                 );
 
-            displayVocabulary(filtered);
+
+            displayVocabulary(filteredWords);
 
         };
 
@@ -328,102 +376,67 @@ function showDays() {
     });
 
 
-    updateWordCount(allVocabulary.length);
+    document.getElementById("no-results").style.display =
+        "none";
 
 }
 
 
+// ==========================================
+// ➕ SHOW ADD WORDS FORM
+// ==========================================
 
-// ===============================
-// 🔍 SEARCH FUNCTION
-// ===============================
+function showAddWords() {
 
-function setupSearch() {
+    document.getElementById("addWordsForm")
+        .style.display = "block";
 
+}
+
+
+// ==========================================
+// ❌ HIDE ADD WORDS FORM
+// ==========================================
+
+function hideAddWords() {
+
+    document.getElementById("addWordsForm")
+        .style.display = "none";
+
+}
+
+
+// ==========================================
+// 💾 SAVE WORDS
+// ==========================================
+
+function saveWords() {
+
+    alert(
+        "Your words are ready to be added. Next we will connect this form directly to Google Sheets!"
+    );
+
+}
+
+
+// ==========================================
+// START WEBSITE
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Load vocabulary
+    loadVocabulary();
+
+
+    // Connect search box
     const searchInput =
         document.getElementById("search");
 
 
-    if (!searchInput) {
-
-        console.error("Search box not found!");
-
-        return;
-
-    }
-
-
-    searchInput.addEventListener("input", function () {
-
-        const searchText =
-            searchInput.value
-                .toLowerCase()
-                .trim();
-
-
-        // If search box is empty → show all words
-
-        if (searchText === "") {
-
-            displayVocabulary(allVocabulary);
-
-            return;
-
-        }
-
-
-        const filteredVocabulary =
-            allVocabulary.filter(word => {
-
-                const german =
-                    String(word.german).toLowerCase();
-
-                const english =
-                    String(word.english).toLowerCase();
-
-                const plural =
-                    String(word.plural).toLowerCase();
-
-                const example =
-                    String(word.example).toLowerCase();
-
-                const topic =
-                    String(word.topic).toLowerCase();
-
-                const date =
-                    String(word.date).toLowerCase();
-
-
-                return (
-
-                    german.includes(searchText) ||
-                    english.includes(searchText) ||
-                    plural.includes(searchText) ||
-                    example.includes(searchText) ||
-                    topic.includes(searchText) ||
-                    date.includes(searchText)
-
-                );
-
-            });
-
-
-        displayVocabulary(filteredVocabulary);
-
-    });
-
-}
-
-
-
-// ===============================
-// START WEBSITE
-// ===============================
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    setupSearch();
-
-    loadVocabulary();
+    searchInput.addEventListener(
+        "input",
+        searchVocabulary
+    );
 
 });
