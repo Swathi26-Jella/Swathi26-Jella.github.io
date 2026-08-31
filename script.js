@@ -49,7 +49,7 @@ async function loadVocabulary() {
         // ==========================================
 
         const savedWords =
-            JSON.parse(localStorage.getItem("myVocabulary")) || [];
+            JSON.parse(localStorage.getItem("addedVocabulary")) || [];
 
 
         // Combine Google Sheet words + Browser words
