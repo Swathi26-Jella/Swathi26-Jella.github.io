@@ -515,19 +515,7 @@ function saveWords() {
     // SAVE IN BROWSER
     // ==========================================
 
-    localStorage.setItem(
-        "myVocabulary",
-        JSON.stringify(
-            allVocabulary.filter(word => {
-
-                // Keep only words that were manually added
-                // This is handled below more safely
-
-                return true;
-
-            })
-        )
-    );
+ 
 
 
     // IMPORTANT:
