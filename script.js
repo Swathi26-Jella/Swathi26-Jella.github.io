@@ -5,6 +5,9 @@
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
 
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbyaTXiyE0PVXtuzZJZ4NBI0TaEa_rOBRd-iob-HB4d3XnNxrE0TQ0OWC5wIfqrVoXiO/exec";
+
 
 // ==========================================
 // GLOBAL VOCABULARY ARRAY
@@ -401,14 +404,14 @@ function hideAddWords() {
 // SAVE 5 NEW WORDS
 // ==========================================
 
-function saveWords() {
+async function saveWords() {
 
     const date =
         document.getElementById("wordDate").value;
 
 
     const topic =
-        document.getElementById("wordTopic").value;
+        document.getElementById("wordTopic").value.trim();
 
 
     // Check date
@@ -502,7 +505,17 @@ function saveWords() {
         return;
 
     }
+    try {
 
+        // Send words to Google Sheets
+
+        await fetch(SCRIPT_URL, {
+
+            method: "POST",
+
+            body: JSON.stringify(newWords)
+
+        });
 
     // ==========================================
     // ADD WORDS TO MAIN ARRAY
@@ -510,30 +523,6 @@ function saveWords() {
 
     allVocabulary.push(...newWords);
 
-
-    // ==========================================
-    // SAVE IN BROWSER
-    // ==========================================
-
- 
-
-
-    // IMPORTANT:
-    // Save only the newly added words separately
-
-    const existingSavedWords =
-        JSON.parse(
-            localStorage.getItem("addedVocabulary")
-        ) || [];
-
-
-    existingSavedWords.push(...newWords);
-
-
-    localStorage.setItem(
-        "addedVocabulary",
-        JSON.stringify(existingSavedWords)
-    );
 
 
     // ==========================================
@@ -585,7 +574,7 @@ function saveWords() {
     alert(
         "🎉 " +
         newWords.length +
-        " neue Wörter wurden gespeichert!"
+        " Wörter wurden erfolgreich in Google Sheets gespeichert!"
     );
 
 
@@ -596,6 +585,16 @@ function saveWords() {
         .scrollIntoView({
             behavior: "smooth"
         });
+
+}    catch (error) {
+
+        console.error("Saving error:", error);
+
+        alert(
+            "❌ Fehler beim Speichern. Bitte versuche es erneut."
+        );
+
+    }
 
 }
 
