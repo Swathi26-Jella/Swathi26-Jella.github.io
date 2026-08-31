@@ -1,5 +1,5 @@
 const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
 
 
 let allVocabulary = [];
@@ -24,31 +24,21 @@ function parseCSV(text) {
         const nextChar = text[i + 1];
 
 
-        // Handle double quotes inside quoted text
         if (char === '"' && insideQuotes && nextChar === '"') {
 
             value += '"';
             i++;
 
-        }
-
-        // Open or close quotes
-        else if (char === '"') {
+        } else if (char === '"') {
 
             insideQuotes = !insideQuotes;
 
-        }
-
-        // New column
-        else if (char === "," && !insideQuotes) {
+        } else if (char === "," && !insideQuotes) {
 
             row.push(value.trim());
             value = "";
 
-        }
-
-        // New row
-        else if ((char === "\n" || char === "\r") && !insideQuotes) {
+        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
 
             if (char === "\r" && nextChar === "\n") {
                 i++;
@@ -63,9 +53,7 @@ function parseCSV(text) {
 
             row = [];
 
-        }
-
-        else {
+        } else {
 
             value += char;
 
@@ -74,7 +62,6 @@ function parseCSV(text) {
     }
 
 
-    // Add the last row
     if (value !== "" || row.length > 0) {
 
         row.push(value.trim());
@@ -90,7 +77,7 @@ function parseCSV(text) {
 
 
 // ===============================
-// LOAD VOCABULARY FROM GOOGLE SHEETS
+// LOAD VOCABULARY
 // ===============================
 
 async function loadVocabulary() {
@@ -104,24 +91,18 @@ async function loadVocabulary() {
         const rows = parseCSV(csvText);
 
 
-        // Skip the first row (header)
-        allVocabulary = rows.slice(1).map(row => {
+        allVocabulary = rows.slice(1).map(row => ({
 
-            return {
+            date: row[0] || "",
+            topic: row[1] || "",
+            german: row[2] || "",
+            english: row[3] || "",
+            plural: row[4] || "",
+            example: row[5] || ""
 
-                date: row[0] || "",
-                topic: row[1] || "",
-                german: row[2] || "",
-                english: row[3] || "",
-                plural: row[4] || "",
-                example: row[5] || ""
-
-            };
-
-        });
+        }));
 
 
-        // Display all words when website opens
         displayVocabulary(allVocabulary);
 
 
@@ -144,15 +125,35 @@ function displayVocabulary(vocabulary) {
     const container =
         document.getElementById("vocabulary-container");
 
+    const noResults =
+        document.getElementById("no-results");
+
 
     container.innerHTML = "";
+
+
+    if (vocabulary.length === 0) {
+
+        if (noResults) {
+            noResults.style.display = "block";
+        }
+
+        updateWordCount(0);
+
+        return;
+
+    }
+
+
+    if (noResults) {
+        noResults.style.display = "none";
+    }
 
 
     vocabulary.forEach(word => {
 
         const card =
             document.createElement("div");
-
 
         card.className = "word-card";
 
@@ -168,8 +169,7 @@ function displayVocabulary(vocabulary) {
             </div>
 
             <div class="plural">
-                <strong>Plural:</strong>
-                ${word.plural}
+                <strong>Plural:</strong> ${word.plural}
             </div>
 
             <div class="example">
@@ -178,8 +178,7 @@ function displayVocabulary(vocabulary) {
             </div>
 
             <small>
-                📅 ${word.date}
-                |
+                📅 ${word.date} |
                 🧠 ${word.topic}
             </small>
 
@@ -191,55 +190,24 @@ function displayVocabulary(vocabulary) {
     });
 
 
-    updateWordCount(vocabulary);
-
-    showNoResultsMessage(vocabulary);
+    updateWordCount(vocabulary.length);
 
 }
 
 
 
 // ===============================
-// UPDATE WORD COUNT
+// WORD COUNT
 // ===============================
 
-function updateWordCount(vocabulary) {
+function updateWordCount(number) {
 
     const wordCount =
         document.getElementById("wordCount");
 
-
     if (wordCount) {
 
-        wordCount.textContent =
-            vocabulary.length;
-
-    }
-
-}
-
-
-
-// ===============================
-// NO RESULTS MESSAGE
-// ===============================
-
-function showNoResultsMessage(vocabulary) {
-
-    const noResults =
-        document.getElementById("no-results");
-
-
-    if (!noResults) return;
-
-
-    if (vocabulary.length === 0) {
-
-        noResults.style.display = "block";
-
-    } else {
-
-        noResults.style.display = "none";
+        wordCount.textContent = number;
 
     }
 
@@ -253,10 +221,13 @@ function showNoResultsMessage(vocabulary) {
 
 function showAll() {
 
-    // Clear search box
-    document.getElementById("search").value = "";
+    const searchInput =
+        document.getElementById("search");
 
-    // Show all vocabulary
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
     displayVocabulary(allVocabulary);
 
 }
@@ -276,15 +247,8 @@ function showTopics() {
     container.innerHTML = "";
 
 
-    // Clear search
-    document.getElementById("search").value = "";
-
-
-    // Get unique topics
     const topics =
-        [...new Set(
-            allVocabulary.map(word => word.topic)
-        )];
+        [...new Set(allVocabulary.map(word => word.topic))];
 
 
     topics.forEach(topic => {
@@ -292,20 +256,17 @@ function showTopics() {
         const button =
             document.createElement("button");
 
-
         button.className = "topic-button";
 
-        button.textContent =
-            "🧠 " + topic;
+        button.textContent = "🧠 " + topic;
 
 
         button.onclick = function () {
 
             const filtered =
-                allVocabulary.filter(
-                    word => word.topic === topic
+                allVocabulary.filter(word =>
+                    word.topic === topic
                 );
-
 
             displayVocabulary(filtered);
 
@@ -317,11 +278,7 @@ function showTopics() {
     });
 
 
-    // Hide no results message
-    document.getElementById("no-results").style.display = "none";
-
-    // Show number of topics
-    updateWordCount([]);
+    updateWordCount(allVocabulary.length);
 
 }
 
@@ -340,15 +297,8 @@ function showDays() {
     container.innerHTML = "";
 
 
-    // Clear search
-    document.getElementById("search").value = "";
-
-
-    // Get unique dates
     const dates =
-        [...new Set(
-            allVocabulary.map(word => word.date)
-        )];
+        [...new Set(allVocabulary.map(word => word.date))];
 
 
     dates.forEach(date => {
@@ -356,20 +306,17 @@ function showDays() {
         const button =
             document.createElement("button");
 
-
         button.className = "day-button";
 
-        button.textContent =
-            "📅 " + date;
+        button.textContent = "📅 " + date;
 
 
         button.onclick = function () {
 
             const filtered =
-                allVocabulary.filter(
-                    word => word.date === date
+                allVocabulary.filter(word =>
+                    word.date === date
                 );
-
 
             displayVocabulary(filtered);
 
@@ -381,55 +328,91 @@ function showDays() {
     });
 
 
-    // Hide no results message
-    document.getElementById("no-results").style.display = "none";
-
-    // Don't show word count while choosing dates
-    updateWordCount([]);
+    updateWordCount(allVocabulary.length);
 
 }
 
 
 
 // ===============================
-// 🔍 SEARCH VOCABULARY
+// 🔍 SEARCH FUNCTION
 // ===============================
 
-const searchInput =
-    document.getElementById("search");
+function setupSearch() {
+
+    const searchInput =
+        document.getElementById("search");
 
 
-searchInput.addEventListener("input", function () {
+    if (!searchInput) {
 
-    const searchText =
-        searchInput.value.toLowerCase().trim();
+        console.error("Search box not found!");
 
+        return;
 
-    const filteredVocabulary =
-        allVocabulary.filter(word => {
-
-            return (
-
-                word.german.toLowerCase().includes(searchText) ||
-
-                word.english.toLowerCase().includes(searchText) ||
-
-                word.plural.toLowerCase().includes(searchText) ||
-
-                word.example.toLowerCase().includes(searchText) ||
-
-                word.topic.toLowerCase().includes(searchText) ||
-
-                word.date.toLowerCase().includes(searchText)
-
-            );
-
-        });
+    }
 
 
-    displayVocabulary(filteredVocabulary);
+    searchInput.addEventListener("input", function () {
 
-});
+        const searchText =
+            searchInput.value
+                .toLowerCase()
+                .trim();
+
+
+        // If search box is empty → show all words
+
+        if (searchText === "") {
+
+            displayVocabulary(allVocabulary);
+
+            return;
+
+        }
+
+
+        const filteredVocabulary =
+            allVocabulary.filter(word => {
+
+                const german =
+                    String(word.german).toLowerCase();
+
+                const english =
+                    String(word.english).toLowerCase();
+
+                const plural =
+                    String(word.plural).toLowerCase();
+
+                const example =
+                    String(word.example).toLowerCase();
+
+                const topic =
+                    String(word.topic).toLowerCase();
+
+                const date =
+                    String(word.date).toLowerCase();
+
+
+                return (
+
+                    german.includes(searchText) ||
+                    english.includes(searchText) ||
+                    plural.includes(searchText) ||
+                    example.includes(searchText) ||
+                    topic.includes(searchText) ||
+                    date.includes(searchText)
+
+                );
+
+            });
+
+
+        displayVocabulary(filteredVocabulary);
+
+    });
+
+}
 
 
 
@@ -437,4 +420,10 @@ searchInput.addEventListener("input", function () {
 // START WEBSITE
 // ===============================
 
-loadVocabulary();
+document.addEventListener("DOMContentLoaded", function () {
+
+    setupSearch();
+
+    loadVocabulary();
+
+});
