@@ -5,16 +5,22 @@
 const CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpPGVhnR14FZyiMvfiQLuAco2rnIU9FKPiM1V29aL7Lpd5NuYtmiG9d0tVOo96pjjzVVeSm1jvHM_A/pub?output=csv";
 
+
 const SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbyaTXiyE0PVXtuzZJZ4NBI0TaEa_rOBRd-iob-HB4d3XnNxrE0TQ0OWC5wIfqrVoXiO/exec";
 
 
+
 // =====================================================
-// GLOBAL DATA
+// GLOBAL VARIABLES
 // =====================================================
 
 let allVocabulary = [];
+
 let currentWords = [];
+
+let currentView = "home";
+
 
 
 // =====================================================
@@ -23,11 +29,14 @@ let currentWords = [];
 
 function showAddWords() {
 
-    const form = document.getElementById("addWordsForm");
+    const form =
+        document.getElementById("addWordsForm");
 
     if (!form) return;
 
-    form.style.display = "flex";
+
+    form.style.display = "block";
+
 
     form.scrollIntoView({
         behavior: "smooth",
@@ -36,57 +45,94 @@ function showAddWords() {
 }
 
 
+
 // =====================================================
 // HIDE ADD WORDS FORM
 // =====================================================
 
 function hideAddWords() {
 
-    const form = document.getElementById("addWordsForm");
+    const form =
+        document.getElementById("addWordsForm");
 
     if (!form) return;
 
+
     form.style.display = "none";
 }
+
 
 
 // =====================================================
 // FORMAT DATE
 // =====================================================
 
-function formatDate(dateString) {
+function formatDate(value) {
 
-    if (!dateString) return "";
+    if (!value) return "";
 
-    const value = String(dateString).trim();
+    const text =
+        String(value).trim();
 
-    // Already dd.mm.yyyy
-    if (/^\d{2}\.\d{2}\.\d{4}$/.test(value)) {
-        return value;
+
+    // dd.mm.yyyy
+
+    if (
+        /^\d{2}\.\d{2}\.\d{4}$/.test(text)
+    ) {
+
+        return text;
     }
+
 
     // yyyy-mm-dd
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
 
-        const [year, month, day] = value.split("-");
+    if (
+        /^\d{4}-\d{2}-\d{2}$/.test(text)
+    ) {
 
-        return `${day}.${month}.${year}`;
+        const parts =
+            text.split("-");
+
+
+        return (
+            parts[2] +
+            "." +
+            parts[1] +
+            "." +
+            parts[0]
+        );
     }
+
 
     // yyyy.mm.dd
-    if (/^\d{4}\.\d{2}\.\d{2}$/.test(value)) {
 
-        const [year, month, day] = value.split(".");
+    if (
+        /^\d{4}\.\d{2}\.\d{2}$/.test(text)
+    ) {
 
-        return `${day}.${month}.${year}`;
+        const parts =
+            text.split(".");
+
+
+        return (
+            parts[2] +
+            "." +
+            parts[1] +
+            "." +
+            parts[0]
+        );
     }
 
-    return value;
+
+    return text;
 }
 
 
+
 // =====================================================
-// SAFE CSV PARSER
+// CSV PARSER
+// Handles commas inside example sentences
 // =====================================================
 
 function parseCSV(text) {
@@ -94,68 +140,96 @@ function parseCSV(text) {
     const rows = [];
 
     let row = [];
+
     let field = "";
+
     let insideQuotes = false;
 
 
-    for (let i = 0; i < text.length; i++) {
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
 
-        const char = text[i];
-        const nextChar = text[i + 1];
+        const char =
+            text[i];
 
+        const next =
+            text[i + 1];
 
-        // QUOTES
 
         if (char === '"') {
 
-            if (insideQuotes && nextChar === '"') {
+            if (
+                insideQuotes &&
+                next === '"'
+            ) {
 
                 field += '"';
+
                 i++;
 
             } else {
 
-                insideQuotes = !insideQuotes;
+                insideQuotes =
+                    !insideQuotes;
             }
+
         }
 
-
-        // COMMA
-
-        else if (char === "," && !insideQuotes) {
-
-            row.push(field.trim());
-
-            field = "";
-        }
-
-
-        // NEW LINE
 
         else if (
-            (char === "\n" || char === "\r") &&
+            char === "," &&
             !insideQuotes
         ) {
 
-            if (char === "\r" && nextChar === "\n") {
+            row.push(
+                field.trim()
+            );
+
+            field = "";
+
+        }
+
+
+        else if (
+            (char === "\n" ||
+             char === "\r") &&
+            !insideQuotes
+        ) {
+
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
+
                 i++;
             }
 
-            row.push(field.trim());
+
+            row.push(
+                field.trim()
+            );
 
 
-            if (row.some(cell => cell !== "")) {
+            if (
+                row.some(
+                    cell =>
+                        cell.trim() !== ""
+                )
+            ) {
 
                 rows.push(row);
             }
 
 
             row = [];
+
             field = "";
+
         }
 
-
-        // NORMAL CHARACTER
 
         else {
 
@@ -164,14 +238,27 @@ function parseCSV(text) {
     }
 
 
-    // LAST FIELD
+    // Last row
 
-    row.push(field.trim());
+    if (
+        field !== "" ||
+        row.length > 0
+    ) {
+
+        row.push(
+            field.trim()
+        );
 
 
-    if (row.some(cell => cell !== "")) {
+        if (
+            row.some(
+                cell =>
+                    cell.trim() !== ""
+            )
+        ) {
 
-        rows.push(row);
+            rows.push(row);
+        }
     }
 
 
@@ -179,72 +266,104 @@ function parseCSV(text) {
 }
 
 
+
 // =====================================================
-// LOAD VOCABULARY FROM GOOGLE SHEETS
+// LOAD VOCABULARY
 // =====================================================
 
 async function loadVocabulary() {
 
     try {
 
-        const response = await fetch(
-            CSV_URL + "&cache=" + Date.now()
-        );
+        const response =
+            await fetch(
+                CSV_URL +
+                "&cache=" +
+                Date.now()
+            );
 
 
         if (!response.ok) {
 
             throw new Error(
-                "Could not load Google Sheet"
+                "Google Sheet could not be loaded."
             );
         }
 
 
-        const csvText = await response.text();
+        const csvText =
+            await response.text();
 
 
-        const rows = parseCSV(csvText);
+        const rows =
+            parseCSV(csvText);
 
 
-        // Remove header row
+        if (rows.length === 0) {
 
-        const dataRows = rows.slice(1);
+            allVocabulary = [];
+
+            updateWordCount(0);
+
+            return;
+        }
 
 
-        allVocabulary = dataRows
+        // Remove header
 
-            .filter(row =>
-                row.some(
-                    cell => String(cell).trim() !== ""
+        const dataRows =
+            rows.slice(1);
+
+
+        allVocabulary =
+            dataRows
+
+                .map(
+                    (row, index) => ({
+
+                        id:
+                            "word-" +
+                            index +
+                            "-" +
+                            Date.now(),
+
+                        date:
+                            formatDate(
+                                row[0] || ""
+                            ),
+
+                        topic:
+                            String(
+                                row[1] || ""
+                            ).trim(),
+
+                        german:
+                            String(
+                                row[2] || ""
+                            ).trim(),
+
+                        english:
+                            String(
+                                row[3] || ""
+                            ).trim(),
+
+                        plural:
+                            String(
+                                row[4] || ""
+                            ).trim(),
+
+                        example:
+                            String(
+                                row[5] || ""
+                            ).trim()
+
+                    })
                 )
-            )
 
-            .map((row, index) => ({
-
-                // Unique ID for display/delete
-
-                id: `${index}-${row[0]}-${row[2]}`,
-
-                date: formatDate(row[0] || ""),
-
-                topic: String(row[1] || "").trim(),
-
-                german: String(row[2] || "").trim(),
-
-                english: String(row[3] || "").trim(),
-
-                plural: String(row[4] || "").trim(),
-
-                example: String(row[5] || "").trim()
-
-            }))
-
-            .filter(word => word.german !== "");
-
-
-        // Keep words hidden initially
-
-        currentWords = [];
+                .filter(
+                    word =>
+                        word.german !== ""
+                );
 
 
         updateWordCount(
@@ -253,16 +372,18 @@ async function loadVocabulary() {
 
 
         console.log(
-            "Vocabulary loaded:",
-            allVocabulary.length
+            "Loaded:",
+            allVocabulary.length,
+            "words"
         );
+
 
     }
 
     catch (error) {
 
         console.error(
-            "Error loading vocabulary:",
+            "Loading error:",
             error
         );
 
@@ -276,19 +397,26 @@ async function loadVocabulary() {
         if (container) {
 
             container.innerHTML = `
-                <div class="no-results">
+
+                <div class="error-box">
+
                     ❌ Wörter konnten nicht geladen werden.
+
                     <br><br>
+
                     Bitte aktualisiere die Seite.
+
                 </div>
+
             `;
         }
     }
 }
 
 
+
 // =====================================================
-// DISPLAY VOCABULARY
+// DISPLAY WORDS
 // =====================================================
 
 function displayVocabulary(words) {
@@ -311,11 +439,15 @@ function displayVocabulary(words) {
     container.innerHTML = "";
 
 
-    if (!words || words.length === 0) {
+    if (
+        !words ||
+        words.length === 0
+    ) {
 
         if (noResults) {
 
-            noResults.style.display = "block";
+            noResults.style.display =
+                "block";
         }
 
         return;
@@ -324,98 +456,152 @@ function displayVocabulary(words) {
 
     if (noResults) {
 
-        noResults.style.display = "none";
+        noResults.style.display =
+            "none";
     }
 
 
-    words.forEach(word => {
+    words.forEach(
+        (word, index) => {
 
-        const card =
-            document.createElement("div");
+            const card =
+                document.createElement(
+                    "article"
+                );
 
 
-        card.className = "word-card";
+            card.className =
+                "word-card";
 
 
-        card.innerHTML = `
+            card.innerHTML = `
 
-            <div class="card-top">
+                <div class="card-top">
 
-                <div class="card-meta">
+                    <div class="card-tags">
 
-                    <span class="topic-tag">
-                        🧠 ${escapeHTML(
-                            word.topic || "Allgemein"
-                        )}
-                    </span>
+                        <span class="topic-tag">
 
-                    <span class="date-tag">
-                        📅 ${escapeHTML(
-                            word.date || ""
-                        )}
-                    </span>
+                            🧠
+                            ${escapeHTML(
+                                word.topic ||
+                                "Allgemein"
+                            )}
+
+                        </span>
+
+
+                        <span class="date-tag">
+
+                            📅
+                            ${escapeHTML(
+                                word.date
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="delete-button"
+                        title="Wort löschen"
+                    >
+                        🗑️
+                    </button>
 
                 </div>
 
 
-                <button
-                    class="delete-button"
-                    title="Wort löschen"
-                    onclick="deleteWord('${escapeForAttribute(word.id)}')"
-                >
-                    🗑️
-                </button>
+                <div class="german-word">
 
-            </div>
+                    🇩🇪
+                    ${escapeHTML(
+                        word.german
+                    )}
 
-
-            <div class="german">
-
-                🇩🇪 ${escapeHTML(word.german)}
-
-            </div>
+                </div>
 
 
-            <div class="english">
+                <div class="english-word">
 
-                🇬🇧 ${escapeHTML(word.english)}
+                    🇬🇧
+                    ${escapeHTML(
+                        word.english
+                    )}
 
-            </div>
-
-
-            ${
-                word.plural
-                    ? `
-                        <div class="plural">
-
-                            <strong>Plural:</strong>
-
-                            ${escapeHTML(word.plural)}
-
-                        </div>
-                    `
-                    : ""
-            }
+                </div>
 
 
-            ${
-                word.example
-                    ? `
-                        <div class="example">
+                ${
+                    word.plural
+                        ? `
 
-                            💬 ${escapeHTML(word.example)}
+                            <div class="plural-box">
 
-                        </div>
-                    `
-                    : ""
-            }
+                                <span class="field-label">
+                                    Plural
+                                </span>
 
-        `;
+                                <span>
+                                    ${escapeHTML(
+                                        word.plural
+                                    )}
+                                </span>
+
+                            </div>
+
+                        `
+                        : ""
+                }
 
 
-        container.appendChild(card);
-    });
+                ${
+                    word.example
+                        ? `
+
+                            <div class="example-box">
+
+                                <span class="field-label">
+                                    💬 Beispiel
+                                </span>
+
+                                <div>
+                                    ${escapeHTML(
+                                        word.example
+                                    )}
+                                </div>
+
+                            </div>
+
+                        `
+                        : ""
+                }
+
+            `;
+
+
+            const deleteButton =
+                card.querySelector(
+                    ".delete-button"
+                );
+
+
+            deleteButton.addEventListener(
+                "click",
+                function () {
+
+                    deleteWord(word);
+                }
+            );
+
+
+            container.appendChild(card);
+        }
+    );
 }
+
 
 
 // =====================================================
@@ -424,41 +610,36 @@ function displayVocabulary(words) {
 
 function escapeHTML(value) {
 
-    if (
-        value === undefined ||
-        value === null
-    ) {
+    return String(
+        value ?? ""
+    )
 
-        return "";
-    }
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-    return String(value)
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
-
-// =====================================================
-// ESCAPE ATTRIBUTE
-// =====================================================
-
-function escapeForAttribute(value) {
-
-    return String(value)
-
-        .replace(/\\/g, "\\\\")
-
-        .replace(/'/g, "\\'");
-}
 
 
 // =====================================================
@@ -468,21 +649,501 @@ function escapeForAttribute(value) {
 function updateWordCount(count) {
 
     const element =
-        document.getElementById("wordCount");
+        document.getElementById(
+            "wordCount"
+        );
 
 
     if (element) {
 
-        element.textContent = count;
+        element.textContent =
+            count;
     }
 }
 
 
+
 // =====================================================
-// CLEAR DISPLAY
+// SHOW ALL WORDS
 // =====================================================
 
-function clearDisplay() {
+function showAll() {
+
+    currentView =
+        "all";
+
+
+    currentWords =
+        [...allVocabulary];
+
+
+    displayVocabulary(
+        currentWords
+    );
+
+
+    updateWordCount(
+        currentWords.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// SHOW TOPICS
+// =====================================================
+
+function showTopics() {
+
+    currentView =
+        "topics";
+
+
+    const container =
+        document.getElementById(
+            "vocabulary-container"
+        );
+
+
+    const noResults =
+        document.getElementById(
+            "no-results"
+        );
+
+
+    if (!container) return;
+
+
+    if (noResults) {
+
+        noResults.style.display =
+            "none";
+    }
+
+
+    const topics =
+        [
+            ...new Set(
+
+                allVocabulary
+
+                    .map(
+                        word =>
+                            word.topic.trim()
+                    )
+
+                    .filter(
+                        topic =>
+                            topic !== ""
+                    )
+            )
+        ];
+
+
+    topics.sort(
+        (a, b) =>
+            a.localeCompare(
+                b,
+                "de"
+            )
+    );
+
+
+    container.innerHTML = `
+
+        <div class="selection-box">
+
+            <div class="selection-icon">
+                🧠
+            </div>
+
+            <h2>
+                Themen
+            </h2>
+
+            <p>
+                Wähle ein Thema, um die Wörter anzuzeigen.
+            </p>
+
+            <div class="topic-list"></div>
+
+        </div>
+
+    `;
+
+
+    const topicList =
+        container.querySelector(
+            ".topic-list"
+        );
+
+
+    topics.forEach(
+        topic => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "topic-button";
+
+
+            button.textContent =
+                "🧠 " + topic;
+
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    filterByTopic(
+                        topic
+                    );
+                }
+            );
+
+
+            topicList.appendChild(
+                button
+            );
+        }
+    );
+
+
+    updateWordCount(
+        allVocabulary.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// FILTER TOPIC
+// =====================================================
+
+function filterByTopic(topic) {
+
+    currentView =
+        "topic";
+
+
+    currentWords =
+        allVocabulary.filter(
+            word =>
+                word.topic === topic
+        );
+
+
+    displayVocabulary(
+        currentWords
+    );
+
+
+    updateWordCount(
+        currentWords.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// SHOW DAYS
+// =====================================================
+
+function showDays() {
+
+    currentView =
+        "days";
+
+
+    const container =
+        document.getElementById(
+            "vocabulary-container"
+        );
+
+
+    const noResults =
+        document.getElementById(
+            "no-results"
+        );
+
+
+    if (!container) return;
+
+
+    if (noResults) {
+
+        noResults.style.display =
+            "none";
+    }
+
+
+    const dates =
+        [
+            ...new Set(
+
+                allVocabulary
+
+                    .map(
+                        word =>
+                            word.date.trim()
+                    )
+
+                    .filter(
+                        date =>
+                            date !== ""
+                    )
+            )
+        ];
+
+
+    dates.sort(
+        (a, b) =>
+            convertDateForSort(b) -
+            convertDateForSort(a)
+    );
+
+
+    container.innerHTML = `
+
+        <div class="selection-box">
+
+            <div class="selection-icon">
+                📅
+            </div>
+
+            <h2>
+                Lerntage
+            </h2>
+
+            <p>
+                Wähle einen Tag, um die Wörter anzuzeigen.
+            </p>
+
+            <div class="day-list"></div>
+
+        </div>
+
+    `;
+
+
+    const dayList =
+        container.querySelector(
+            ".day-list"
+        );
+
+
+    dates.forEach(
+        date => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "day-button";
+
+
+            button.textContent =
+                "📅 " + date;
+
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    filterByDate(
+                        date
+                    );
+                }
+            );
+
+
+            dayList.appendChild(
+                button
+            );
+        }
+    );
+
+
+    updateWordCount(
+        allVocabulary.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// FILTER DATE
+// =====================================================
+
+function filterByDate(date) {
+
+    currentView =
+        "date";
+
+
+    currentWords =
+        allVocabulary.filter(
+            word =>
+                word.date === date
+        );
+
+
+    displayVocabulary(
+        currentWords
+    );
+
+
+    updateWordCount(
+        currentWords.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// DATE SORT
+// =====================================================
+
+function convertDateForSort(dateString) {
+
+    const parts =
+        String(
+            dateString
+        ).split(".");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return 0;
+    }
+
+
+    return new Date(
+
+        Number(parts[2]),
+
+        Number(parts[1]) - 1,
+
+        Number(parts[0])
+
+    ).getTime();
+}
+
+
+
+// =====================================================
+// SEARCH
+// =====================================================
+
+function searchVocabulary() {
+
+    const input =
+        document.getElementById(
+            "search"
+        );
+
+
+    if (!input) return;
+
+
+    const text =
+        input.value
+            .toLowerCase()
+            .trim();
+
+
+    if (!text) {
+
+        clearVocabularyDisplay();
+
+        updateWordCount(
+            allVocabulary.length
+        );
+
+        return;
+    }
+
+
+    currentView =
+        "search";
+
+
+    currentWords =
+        allVocabulary.filter(
+            word => {
+
+                const searchableText = [
+
+                    word.german,
+
+                    word.english,
+
+                    word.plural,
+
+                    word.example,
+
+                    word.topic,
+
+                    word.date
+
+                ]
+
+                    .join(" ")
+
+                    .toLowerCase();
+
+
+                return searchableText.includes(
+                    text
+                );
+            }
+        );
+
+
+    displayVocabulary(
+        currentWords
+    );
+
+
+    updateWordCount(
+        currentWords.length
+    );
+
+
+    scrollToVocabulary();
+}
+
+
+
+// =====================================================
+// CLEAR VOCABULARY DISPLAY
+// =====================================================
+
+function clearVocabularyDisplay() {
 
     const container =
         document.getElementById(
@@ -504,377 +1165,44 @@ function clearDisplay() {
 
     if (noResults) {
 
-        noResults.style.display = "none";
-    }
-}
-
-
-// =====================================================
-// SHOW ALL WORDS
-// =====================================================
-
-function showAll() {
-
-    currentWords =
-        [...allVocabulary];
-
-
-    displayVocabulary(
-        currentWords
-    );
-
-
-    updateWordCount(
-        allVocabulary.length
-    );
-}
-
-
-// =====================================================
-// SHOW TOPICS
-// =====================================================
-
-function showTopics() {
-
-    const container =
-        document.getElementById(
-            "vocabulary-container"
-        );
-
-
-    const noResults =
-        document.getElementById(
-            "no-results"
-        );
-
-
-    if (!container) return;
-
-
-    if (noResults) {
-
-        noResults.style.display = "none";
+        noResults.style.display =
+            "none";
     }
 
 
-    const topics =
-        [...new Set(
-
-            allVocabulary
-
-                .map(word =>
-                    word.topic.trim()
-                )
-
-                .filter(topic =>
-                    topic !== ""
-                )
-
-        )];
-
-
-    container.innerHTML = `
-
-        <div class="filter-title">
-
-            🧠 Wähle ein Thema
-
-        </div>
-
-
-        <div class="topic-list">
-
-        </div>
-
-    `;
-
-
-    const topicList =
-        container.querySelector(
-            ".topic-list"
-        );
-
-
-    topics.sort();
-
-
-    topics.forEach(topic => {
-
-        const button =
-            document.createElement("button");
-
-
-        button.className =
-            "topic-button";
-
-
-        button.textContent =
-            "🧠 " + topic;
-
-
-        button.onclick = function () {
-
-            filterByTopic(topic);
-        };
-
-
-        topicList.appendChild(button);
-    });
-
-
-    updateWordCount(
-        allVocabulary.length
-    );
+    currentWords = [];
 }
 
 
-// =====================================================
-// FILTER BY TOPIC
-// =====================================================
-
-function filterByTopic(topic) {
-
-    currentWords =
-        allVocabulary.filter(
-            word => word.topic === topic
-        );
-
-
-    displayVocabulary(
-        currentWords
-    );
-
-
-    updateWordCount(
-        currentWords.length
-    );
-}
-
 
 // =====================================================
-// SHOW DAYS
+// SCROLL TO VOCABULARY
 // =====================================================
 
-function showDays() {
+function scrollToVocabulary() {
 
-    const container =
-        document.getElementById(
-            "vocabulary-container"
+    const section =
+        document.querySelector(
+            ".vocabulary-section"
         );
 
 
-    const noResults =
-        document.getElementById(
-            "no-results"
-        );
+    if (!section) return;
 
 
-    if (!container) return;
+    setTimeout(
+        function () {
 
+            section.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
-    if (noResults) {
-
-        noResults.style.display = "none";
-    }
-
-
-    const dates =
-        [...new Set(
-
-            allVocabulary
-
-                .map(word =>
-                    word.date.trim()
-                )
-
-                .filter(date =>
-                    date !== ""
-                )
-
-        )];
-
-
-    // NEWEST FIRST
-
-    dates.sort((a, b) => {
-
-        return (
-            convertDateForSort(b) -
-            convertDateForSort(a)
-        );
-    });
-
-
-    container.innerHTML = `
-
-        <div class="filter-title">
-
-            📅 Wähle einen Tag
-
-        </div>
-
-
-        <div class="day-list">
-
-        </div>
-
-    `;
-
-
-    const dayList =
-        container.querySelector(
-            ".day-list"
-        );
-
-
-    dates.forEach(date => {
-
-        const button =
-            document.createElement("button");
-
-
-        button.className =
-            "day-button";
-
-
-        button.textContent =
-            "📅 " + date;
-
-
-        button.onclick = function () {
-
-            filterByDate(date);
-        };
-
-
-        dayList.appendChild(button);
-    });
-
-
-    updateWordCount(
-        allVocabulary.length
+        },
+        100
     );
 }
 
-
-// =====================================================
-// FILTER BY DATE
-// =====================================================
-
-function filterByDate(date) {
-
-    currentWords =
-        allVocabulary.filter(
-            word => word.date === date
-        );
-
-
-    displayVocabulary(
-        currentWords
-    );
-
-
-    updateWordCount(
-        currentWords.length
-    );
-}
-
-
-// =====================================================
-// DATE SORTING
-// =====================================================
-
-function convertDateForSort(dateString) {
-
-    const parts =
-        String(dateString).split(".");
-
-
-    if (parts.length !== 3) {
-
-        return new Date(0).getTime();
-    }
-
-
-    return new Date(
-
-        Number(parts[2]),
-
-        Number(parts[1]) - 1,
-
-        Number(parts[0])
-
-    ).getTime();
-}
-
-
-// =====================================================
-// SEARCH VOCABULARY
-// =====================================================
-
-function searchVocabulary() {
-
-    const input =
-        document.getElementById("search");
-
-
-    if (!input) return;
-
-
-    const searchText =
-        input.value
-            .toLowerCase()
-            .trim();
-
-
-    if (!searchText) {
-
-        clearDisplay();
-
-        updateWordCount(
-            allVocabulary.length
-        );
-
-        return;
-    }
-
-
-    currentWords =
-        allVocabulary.filter(word => {
-
-            return [
-
-                word.german,
-
-                word.english,
-
-                word.plural,
-
-                word.example,
-
-                word.topic,
-
-                word.date
-
-            ]
-
-                .join(" ")
-
-                .toLowerCase()
-
-                .includes(searchText);
-        });
-
-
-    displayVocabulary(
-        currentWords
-    );
-
-
-    updateWordCount(
-        currentWords.length
-    );
-}
 
 
 // =====================================================
@@ -884,16 +1212,25 @@ function searchVocabulary() {
 async function saveWords() {
 
     const dateInput =
-        document.getElementById("wordDate");
+        document.getElementById(
+            "wordDate"
+        );
 
 
     const topicInput =
-        document.getElementById("wordTopic");
+        document.getElementById(
+            "wordTopic"
+        );
 
 
-    if (!dateInput || !topicInput) {
+    if (
+        !dateInput ||
+        !topicInput
+    ) {
 
-        alert("❌ Formular wurde nicht gefunden.");
+        alert(
+            "❌ Formular nicht gefunden."
+        );
 
         return;
     }
@@ -909,7 +1246,7 @@ async function saveWords() {
         topicInput.value.trim();
 
 
-    // VALIDATE DATE
+    // Validate date
 
     if (!date) {
 
@@ -921,7 +1258,7 @@ async function saveWords() {
     }
 
 
-    // VALIDATE TOPIC
+    // Validate topic
 
     if (!topic) {
 
@@ -936,59 +1273,51 @@ async function saveWords() {
     const newWords = [];
 
 
-    // COLLECT WORDS
+    // Read 5 rows
 
-    for (let i = 1; i <= 5; i++) {
-
-        const germanElement =
-            document.getElementById(
-                `german${i}`
-            );
-
-
-        const englishElement =
-            document.getElementById(
-                `english${i}`
-            );
-
-
-        const pluralElement =
-            document.getElementById(
-                `plural${i}`
-            );
-
-
-        const exampleElement =
-            document.getElementById(
-                `example${i}`
-            );
-
+    for (
+        let i = 1;
+        i <= 5;
+        i++
+    ) {
 
         const german =
-            germanElement
-                ? germanElement.value.trim()
-                : "";
+            document
+                .getElementById(
+                    `german${i}`
+                )
+                .value
+                .trim();
 
 
         const english =
-            englishElement
-                ? englishElement.value.trim()
-                : "";
+            document
+                .getElementById(
+                    `english${i}`
+                )
+                .value
+                .trim();
 
 
         const plural =
-            pluralElement
-                ? pluralElement.value.trim()
-                : "";
+            document
+                .getElementById(
+                    `plural${i}`
+                )
+                .value
+                .trim();
 
 
         const example =
-            exampleElement
-                ? exampleElement.value.trim()
-                : "";
+            document
+                .getElementById(
+                    `example${i}`
+                )
+                .value
+                .trim();
 
 
-        // Ignore empty rows
+        // Empty German word = skip row
 
         if (!german) {
 
@@ -1014,9 +1343,9 @@ async function saveWords() {
     }
 
 
-    // CHECK WORDS
-
-    if (newWords.length === 0) {
+    if (
+        newWords.length === 0
+    ) {
 
         alert(
             "🇩🇪 Bitte gib mindestens ein deutsches Wort ein."
@@ -1036,14 +1365,17 @@ async function saveWords() {
 
         if (saveButton) {
 
-            saveButton.disabled = true;
+            saveButton.disabled =
+                true;
 
             saveButton.textContent =
                 "⏳ Speichern...";
         }
 
 
+        // =========================================
         // SEND TO GOOGLE APPS SCRIPT
+        // =========================================
 
         await fetch(
             SCRIPT_URL,
@@ -1063,46 +1395,45 @@ async function saveWords() {
                 body:
                     JSON.stringify({
 
-                       action: "add",
+                        action: "add",
 
-                       words: newWords
+                        words: newWords
 
-                })
+                    })
 
             }
         );
 
 
-        // WAIT FOR GOOGLE SHEETS
+        // Give Google Sheets time to update
 
-        await new Promise(resolve =>
-            setTimeout(resolve, 2000)
-        );
+        await wait(2500);
 
 
-        // CLEAR FORM
-
-        clearWordForm();
-
-
-        // HIDE FORM
-
-        hideAddWords();
-
-
-        // RELOAD DATA
+        // Reload from Google Sheets
 
         await loadVocabulary();
 
 
-        // SHOW ALL WORDS AFTER SAVING
+        // Clear form
+
+        clearWordForm();
+
+
+        // Hide form
+
+        hideAddWords();
+
+
+        // Show all words
 
         showAll();
 
 
         alert(
-            `✅ ${newWords.length} Wörter erfolgreich gespeichert!`
+            `✅ ${newWords.length} Wörter wurden gespeichert.`
         );
+
 
     }
 
@@ -1115,16 +1446,17 @@ async function saveWords() {
 
 
         alert(
-            "❌ Fehler beim Speichern der Wörter."
+            "❌ Die Wörter konnten nicht gespeichert werden."
         );
-    }
 
+    }
 
     finally {
 
         if (saveButton) {
 
-            saveButton.disabled = false;
+            saveButton.disabled =
+                false;
 
             saveButton.textContent =
                 "💾 Wörter speichern";
@@ -1133,18 +1465,40 @@ async function saveWords() {
 }
 
 
+
 // =====================================================
-// CLEAR ADD WORD FORM
+// WAIT
+// =====================================================
+
+function wait(milliseconds) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                milliseconds
+            )
+    );
+}
+
+
+
+// =====================================================
+// CLEAR FORM
 // =====================================================
 
 function clearWordForm() {
 
     const dateInput =
-        document.getElementById("wordDate");
+        document.getElementById(
+            "wordDate"
+        );
 
 
     const topicInput =
-        document.getElementById("wordTopic");
+        document.getElementById(
+            "wordTopic"
+        );
 
 
     if (dateInput) {
@@ -1159,9 +1513,13 @@ function clearWordForm() {
     }
 
 
-    for (let i = 1; i <= 5; i++) {
+    for (
+        let i = 1;
+        i <= 5;
+        i++
+    ) {
 
-        const fields = [
+        const ids = [
 
             `german${i}`,
 
@@ -1174,40 +1532,31 @@ function clearWordForm() {
         ];
 
 
-        fields.forEach(id => {
+        ids.forEach(
+            id => {
 
-            const element =
-                document.getElementById(id);
+                const element =
+                    document.getElementById(
+                        id
+                    );
 
 
-            if (element) {
+                if (element) {
 
-                element.value = "";
+                    element.value = "";
+                }
             }
-        });
+        );
     }
 }
+
 
 
 // =====================================================
 // DELETE WORD
 // =====================================================
 
-async function deleteWord(wordId) {
-
-    const word =
-        allVocabulary.find(
-            item => item.id === wordId
-        );
-
-
-    if (!word) {
-
-        alert("❌ Wort wurde nicht gefunden.");
-
-        return;
-    }
-
+async function deleteWord(word) {
 
     const confirmation =
         confirm(
@@ -1221,19 +1570,21 @@ async function deleteWord(wordId) {
     }
 
 
-    // =================================================
+    // =========================================
     // REMOVE IMMEDIATELY FROM WEBSITE
-    // =================================================
+    // =========================================
 
     allVocabulary =
         allVocabulary.filter(
-            item => item.id !== wordId
+            item =>
+                item.id !== word.id
         );
 
 
     currentWords =
         currentWords.filter(
-            item => item.id !== wordId
+            item =>
+                item.id !== word.id
         );
 
 
@@ -1247,9 +1598,9 @@ async function deleteWord(wordId) {
     );
 
 
-    // =================================================
-    // SEND DELETE REQUEST TO GOOGLE APPS SCRIPT
-    // =================================================
+    // =========================================
+    // DELETE FROM GOOGLE SHEETS
+    // =========================================
 
     try {
 
@@ -1270,12 +1621,6 @@ async function deleteWord(wordId) {
 
                 body:
                     JSON.stringify({
-
-                       action: "add",
-
-                       words: newWords
-
-              })
 
                         action: "delete",
 
@@ -1298,7 +1643,7 @@ async function deleteWord(wordId) {
 
 
         console.log(
-            "Delete request sent for:",
+            "Delete request sent:",
             word.german
         );
 
@@ -1311,13 +1656,9 @@ async function deleteWord(wordId) {
             "Delete error:",
             error
         );
-
-
-        alert(
-            "⚠️ Das Wort wurde von der Website entfernt, aber Google Sheets konnte möglicherweise nicht aktualisiert werden."
-        );
     }
 }
+
 
 
 // =====================================================
@@ -1326,15 +1667,19 @@ async function deleteWord(wordId) {
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    async function () {
 
         const searchInput =
-            document.getElementById("search");
+            document.getElementById(
+                "search"
+            );
 
+
+        // =========================================
+        // SEARCH WHILE TYPING
+        // =========================================
 
         if (searchInput) {
-
-            // Search while typing
 
             searchInput.addEventListener(
                 "input",
@@ -1342,13 +1687,13 @@ document.addEventListener(
             );
 
 
-            // Search when ENTER is pressed
-
             searchInput.addEventListener(
                 "keydown",
                 function (event) {
 
-                    if (event.key === "Enter") {
+                    if (
+                        event.key === "Enter"
+                    ) {
 
                         searchVocabulary();
                     }
@@ -1357,9 +1702,19 @@ document.addEventListener(
         }
 
 
-        // LOAD WORDS
-        // BUT DO NOT DISPLAY THEM
+        // =========================================
+        // LOAD DATA
+        // =========================================
 
-        loadVocabulary();
+        await loadVocabulary();
+
+
+        // =========================================
+        // IMPORTANT:
+        // DO NOT SHOW WORDS AT START
+        // =========================================
+
+        clearVocabularyDisplay();
+
     }
 );
