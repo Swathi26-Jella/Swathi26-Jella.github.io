@@ -5,8 +5,10 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Mein Deutsch-Lernjournal</title>
 
@@ -18,46 +20,43 @@
 <body>
 
 
-    <!-- =========================
+    <!-- ==========================================
          HEADER
-    ========================== -->
+    =========================================== -->
 
     <header class="header">
 
-        <div class="header-content">
+        <h1>🇩🇪 Mein Deutsch-Lernjournal</h1>
 
-            <h1>🇩🇪 Mein Deutsch-Lernjournal</h1>
+        <p class="header-description">
+            Wortschatz lernen · Üben · Wiederholen
+        </p>
 
-            <p class="header-description">
-                Wortschatz lernen · Üben · Wiederholen
-            </p>
-
-            <p class="subtitle">
-                📚 Wörter &nbsp; • &nbsp;
-                🧠 Themen &nbsp; • &nbsp;
-                📅 Tägliches Lernen
-            </p>
-
-        </div>
+        <p class="subtitle">
+            📚 Wörter &nbsp; • &nbsp;
+            🧠 Themen &nbsp; • &nbsp;
+            📅 Tägliches Lernen
+        </p>
 
     </header>
 
 
 
-    <!-- =========================
-         MAIN
-    ========================== -->
+    <!-- ==========================================
+         MAIN CONTAINER
+    =========================================== -->
 
     <main class="container">
 
 
-        <!-- =========================
-             ADD WORD BUTTON
-        ========================== -->
+        <!-- ==========================================
+             TOP ACTION BUTTONS
+        =========================================== -->
 
-        <section class="add-section">
+        <section class="top-actions">
 
             <button
+                type="button"
                 class="add-button"
                 onclick="showAddWords()"
             >
@@ -68,9 +67,9 @@
 
 
 
-        <!-- =========================
-             ADD WORD FORM
-        ========================== -->
+        <!-- ==========================================
+             ADD WORDS FORM
+        =========================================== -->
 
         <section
             id="addWordsForm"
@@ -78,47 +77,81 @@
             style="display: none;"
         >
 
-            <h2>📚 Neue Wörter hinzufügen</h2>
 
+            <!-- FORM HEADER -->
 
-            <!-- DATE -->
+            <div class="form-header">
 
-            <div class="form-group">
+                <div>
 
-                <label for="wordDate">
-                    📅 Datum
-                </label>
+                    <h2>
+                        ➕ Neue Wörter hinzufügen
+                    </h2>
 
-                <input
-                    type="date"
-                    id="wordDate"
+                    <p>
+                        Füge bis zu 5 neue Wörter gleichzeitig hinzu.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="close-form-button"
+                    onclick="hideAddWords()"
+                    title="Schließen"
                 >
-
-            </div>
-
-
-            <!-- TOPIC -->
-
-            <div class="form-group">
-
-                <label for="wordTopic">
-                    🧠 Thema
-                </label>
-
-                <input
-                    type="text"
-                    id="wordTopic"
-                    placeholder="z. B. Embedded Systems"
-                >
+                    ✕
+                </button>
 
             </div>
 
 
 
-            <!-- WORD TABLE -->
+            <!-- DATE + TOPIC -->
+
+            <div class="form-info-grid">
+
+
+                <div class="form-group">
+
+                    <label for="wordDate">
+                        📅 Datum
+                    </label>
+
+                    <input
+                        type="date"
+                        id="wordDate"
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="wordTopic">
+                        🧠 Thema
+                    </label>
+
+                    <input
+                        type="text"
+                        id="wordTopic"
+                        placeholder="z. B. Debugging"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- WORD INPUT AREA -->
 
             <div class="word-input-table">
 
+
+                <!-- TABLE HEADER -->
 
                 <div class="table-header">
 
@@ -128,7 +161,7 @@
 
                     <div>Plural</div>
 
-                    <div>💬 Beispiel</div>
+                    <div>💬 Beispielsatz</div>
 
                 </div>
 
@@ -138,17 +171,29 @@
 
                 <div class="word-row">
 
-                    <input type="text" id="german1"
-                        placeholder="der Parameter">
+                    <input
+                        type="text"
+                        id="german1"
+                        placeholder="der Parameter"
+                    >
 
-                    <input type="text" id="english1"
-                        placeholder="parameter">
+                    <input
+                        type="text"
+                        id="english1"
+                        placeholder="parameter"
+                    >
 
-                    <input type="text" id="plural1"
-                        placeholder="die Parameter">
+                    <input
+                        type="text"
+                        id="plural1"
+                        placeholder="die Parameter"
+                    >
 
-                    <input type="text" id="example1"
-                        placeholder="Der Parameter ist wichtig.">
+                    <input
+                        type="text"
+                        id="example1"
+                        placeholder="Der Parameter ist wichtig."
+                    >
 
                 </div>
 
@@ -158,17 +203,29 @@
 
                 <div class="word-row">
 
-                    <input type="text" id="german2"
-                        placeholder="Deutsch">
+                    <input
+                        type="text"
+                        id="german2"
+                        placeholder="Deutsch"
+                    >
 
-                    <input type="text" id="english2"
-                        placeholder="English">
+                    <input
+                        type="text"
+                        id="english2"
+                        placeholder="English"
+                    >
 
-                    <input type="text" id="plural2"
-                        placeholder="Plural">
+                    <input
+                        type="text"
+                        id="plural2"
+                        placeholder="Plural"
+                    >
 
-                    <input type="text" id="example2"
-                        placeholder="Beispielsatz">
+                    <input
+                        type="text"
+                        id="example2"
+                        placeholder="Beispielsatz"
+                    >
 
                 </div>
 
@@ -178,17 +235,29 @@
 
                 <div class="word-row">
 
-                    <input type="text" id="german3"
-                        placeholder="Deutsch">
+                    <input
+                        type="text"
+                        id="german3"
+                        placeholder="Deutsch"
+                    >
 
-                    <input type="text" id="english3"
-                        placeholder="English">
+                    <input
+                        type="text"
+                        id="english3"
+                        placeholder="English"
+                    >
 
-                    <input type="text" id="plural3"
-                        placeholder="Plural">
+                    <input
+                        type="text"
+                        id="plural3"
+                        placeholder="Plural"
+                    >
 
-                    <input type="text" id="example3"
-                        placeholder="Beispielsatz">
+                    <input
+                        type="text"
+                        id="example3"
+                        placeholder="Beispielsatz"
+                    >
 
                 </div>
 
@@ -198,17 +267,29 @@
 
                 <div class="word-row">
 
-                    <input type="text" id="german4"
-                        placeholder="Deutsch">
+                    <input
+                        type="text"
+                        id="german4"
+                        placeholder="Deutsch"
+                    >
 
-                    <input type="text" id="english4"
-                        placeholder="English">
+                    <input
+                        type="text"
+                        id="english4"
+                        placeholder="English"
+                    >
 
-                    <input type="text" id="plural4"
-                        placeholder="Plural">
+                    <input
+                        type="text"
+                        id="plural4"
+                        placeholder="Plural"
+                    >
 
-                    <input type="text" id="example4"
-                        placeholder="Beispielsatz">
+                    <input
+                        type="text"
+                        id="example4"
+                        placeholder="Beispielsatz"
+                    >
 
                 </div>
 
@@ -218,17 +299,29 @@
 
                 <div class="word-row">
 
-                    <input type="text" id="german5"
-                        placeholder="Deutsch">
+                    <input
+                        type="text"
+                        id="german5"
+                        placeholder="Deutsch"
+                    >
 
-                    <input type="text" id="english5"
-                        placeholder="English">
+                    <input
+                        type="text"
+                        id="english5"
+                        placeholder="English"
+                    >
 
-                    <input type="text" id="plural5"
-                        placeholder="Plural">
+                    <input
+                        type="text"
+                        id="plural5"
+                        placeholder="Plural"
+                    >
 
-                    <input type="text" id="example5"
-                        placeholder="Beispielsatz">
+                    <input
+                        type="text"
+                        id="example5"
+                        placeholder="Beispielsatz"
+                    >
 
                 </div>
 
@@ -237,11 +330,12 @@
 
 
 
-            <!-- BUTTONS -->
+            <!-- FORM BUTTONS -->
 
-            <div class="form-buttons">
+            <div class="form-actions">
 
                 <button
+                    type="button"
                     class="save-button"
                     onclick="saveWords()"
                 >
@@ -250,10 +344,11 @@
 
 
                 <button
+                    type="button"
                     class="cancel-button"
                     onclick="hideAddWords()"
                 >
-                    ❌ Abbrechen
+                    Abbrechen
                 </button>
 
             </div>
@@ -263,55 +358,27 @@
 
 
 
-        <!-- =========================
+        <!-- ==========================================
              SEARCH
-        ========================== -->
+        =========================================== -->
 
         <section class="search-section">
 
-            <input
-                type="text"
-                id="search"
-                placeholder="🔍 Suche nach Deutsch, English, Plural oder Thema..."
-            >
+            <div class="search-box">
 
-        </section>
+                <input
+                    type="text"
+                    id="search"
+                    placeholder="🔍 Suche nach Deutsch, Englisch, Plural oder Thema..."
+                >
 
-
-
-        <!-- =========================
-             FILTERS
-        ========================== -->
-
-        <section class="filters">
-
-            <button onclick="showAll()">
-                📚 Alle Wörter
-            </button>
-
-            <button onclick="showTopics()">
-                🧠 Themen
-            </button>
-
-            <button onclick="showDays()">
-                📅 Tage
-            </button>
-
-        </section>
-
-
-
-        <!-- =========================
-             STATISTICS
-        ========================== -->
-
-        <section class="statistics">
-
-            <div class="stat-card">
-
-                <strong id="wordCount">0</strong>
-
-                <span>Wörter angezeigt</span>
+                <button
+                    type="button"
+                    class="search-button"
+                    onclick="searchVocabulary()"
+                >
+                    🔍 Suchen
+                </button>
 
             </div>
 
@@ -319,21 +386,86 @@
 
 
 
-        <!-- =========================
-             VOCABULARY
-        ========================== -->
+        <!-- ==========================================
+             NAVIGATION FILTERS
+        =========================================== -->
 
-        <section class="vocabulary-section">
+        <section class="filters">
 
-            <div id="vocabulary-container"></div>
+
+            <button
+                type="button"
+                onclick="showAll()"
+            >
+                📚 Alle Wörter
+            </button>
+
+
+            <button
+                type="button"
+                onclick="showTopics()"
+            >
+                🧠 Themen
+            </button>
+
+
+            <button
+                type="button"
+                onclick="showDays()"
+            >
+                📅 Tage
+            </button>
+
 
         </section>
 
 
 
-        <!-- =========================
+        <!-- ==========================================
+             STATISTICS
+        =========================================== -->
+
+        <section class="statistics">
+
+            <div class="stat-card">
+
+                <strong id="wordCount">
+                    0
+                </strong>
+
+                <span>
+                    Wörter gespeichert
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==========================================
+             VOCABULARY AREA
+
+             IMPORTANT:
+             Initially EMPTY.
+             Words appear only after clicking:
+             Alle Wörter / Themen / Tage / Search
+        =========================================== -->
+
+        <section class="vocabulary-section">
+
+            <div
+                id="vocabulary-container"
+            >
+            </div>
+
+        </section>
+
+
+
+        <!-- ==========================================
              NO RESULTS
-        ========================== -->
+        =========================================== -->
 
         <div
             id="no-results"
@@ -350,25 +482,27 @@
 
 
 
-    <!-- =========================
+    <!-- ==========================================
          FOOTER
-    ========================== -->
+    =========================================== -->
 
     <footer>
 
-        <p>🇩🇪 Mein Deutsch-Lernjournal</p>
+        <p>
+            🇩🇪 Mein Deutsch-Lernjournal
+        </p>
 
         <p>
-            Mein persönliches Lernprojekt 📚
+            Mein persönliches Lernprojekt
         </p>
 
     </footer>
 
 
 
-    <!-- =========================
+    <!-- ==========================================
          JAVASCRIPT
-    ========================== -->
+    =========================================== -->
 
     <script src="script.js"></script>
 
