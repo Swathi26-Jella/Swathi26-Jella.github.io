@@ -20,65 +20,76 @@
 <body>
 
 
-    <!-- ==========================================
+    <!-- =========================================
          HEADER
-    =========================================== -->
+    ========================================== -->
 
     <header class="header">
 
-        <h1>🇩🇪 Mein Deutsch-Lernjournal</h1>
+        <div class="header-content">
 
-        <p class="header-description">
-            Wortschatz lernen · Üben · Wiederholen
-        </p>
+            <div class="header-icon">
+                🇩🇪
+            </div>
 
-        <p class="subtitle">
-            📚 Wörter &nbsp; • &nbsp;
-            🧠 Themen &nbsp; • &nbsp;
-            📅 Tägliches Lernen
-        </p>
+            <h1>
+                Mein Deutsch-Lernjournal
+            </h1>
+
+            <p>
+                Wortschatz lernen · Üben · Wiederholen
+            </p>
+
+            <div class="header-subtitle">
+                📚 Wörter &nbsp; • &nbsp;
+                🧠 Themen &nbsp; • &nbsp;
+                📅 Tägliches Lernen
+            </div>
+
+        </div>
 
     </header>
 
 
 
-    <!-- ==========================================
-         MAIN CONTAINER
-    =========================================== -->
+    <!-- =========================================
+         MAIN
+    ========================================== -->
 
     <main class="container">
 
 
-        <!-- ==========================================
-             TOP ACTION BUTTONS
-        =========================================== -->
+        <!-- =========================================
+             ADD WORDS
+        ========================================== -->
 
-        <section class="top-actions">
+        <section class="add-section">
 
             <button
                 type="button"
                 class="add-button"
                 onclick="showAddWords()"
             >
-                ➕ Neue Wörter hinzufügen
+
+                <span>➕</span>
+
+                Neue Wörter hinzufügen
+
             </button>
 
         </section>
 
 
 
-        <!-- ==========================================
-             ADD WORDS FORM
-        =========================================== -->
+        <!-- =========================================
+             ADD WORD FORM
+        ========================================== -->
 
         <section
             id="addWordsForm"
             class="add-words-form"
-            style="display: none;"
         >
 
-
-            <!-- FORM HEADER -->
 
             <div class="form-header">
 
@@ -89,16 +100,16 @@
                     </h2>
 
                     <p>
-                        Füge bis zu 5 neue Wörter gleichzeitig hinzu.
+                        Du kannst bis zu 5 Wörter gleichzeitig hinzufügen.
                     </p>
 
                 </div>
+
 
                 <button
                     type="button"
                     class="close-form-button"
                     onclick="hideAddWords()"
-                    title="Schließen"
                 >
                     ✕
                 </button>
@@ -126,7 +137,6 @@
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="wordTopic">
@@ -136,7 +146,7 @@
                     <input
                         type="text"
                         id="wordTopic"
-                        placeholder="z. B. Debugging"
+                        placeholder="z. B. Embedded C"
                     >
 
                 </div>
@@ -146,22 +156,28 @@
 
 
 
-            <!-- WORD INPUT AREA -->
+            <!-- WORD TABLE -->
 
             <div class="word-input-table">
 
 
-                <!-- TABLE HEADER -->
-
                 <div class="table-header">
 
-                    <div>🇩🇪 Deutsch</div>
+                    <div>
+                        🇩🇪 Deutsch
+                    </div>
 
-                    <div>🇬🇧 English</div>
+                    <div>
+                        🇬🇧 English
+                    </div>
 
-                    <div>Plural</div>
+                    <div>
+                        Plural
+                    </div>
 
-                    <div>💬 Beispielsatz</div>
+                    <div>
+                        💬 Beispielsatz
+                    </div>
 
                 </div>
 
@@ -172,26 +188,26 @@
                 <div class="word-row">
 
                     <input
-                        type="text"
                         id="german1"
+                        type="text"
                         placeholder="der Parameter"
                     >
 
                     <input
-                        type="text"
                         id="english1"
+                        type="text"
                         placeholder="parameter"
                     >
 
                     <input
-                        type="text"
                         id="plural1"
+                        type="text"
                         placeholder="die Parameter"
                     >
 
                     <input
-                        type="text"
                         id="example1"
+                        type="text"
                         placeholder="Der Parameter ist wichtig."
                     >
 
@@ -204,26 +220,26 @@
                 <div class="word-row">
 
                     <input
-                        type="text"
                         id="german2"
+                        type="text"
                         placeholder="Deutsch"
                     >
 
                     <input
-                        type="text"
                         id="english2"
+                        type="text"
                         placeholder="English"
                     >
 
                     <input
-                        type="text"
                         id="plural2"
+                        type="text"
                         placeholder="Plural"
                     >
 
                     <input
-                        type="text"
                         id="example2"
+                        type="text"
                         placeholder="Beispielsatz"
                     >
 
@@ -236,26 +252,26 @@
                 <div class="word-row">
 
                     <input
-                        type="text"
                         id="german3"
+                        type="text"
                         placeholder="Deutsch"
                     >
 
                     <input
-                        type="text"
                         id="english3"
+                        type="text"
                         placeholder="English"
                     >
 
                     <input
-                        type="text"
                         id="plural3"
+                        type="text"
                         placeholder="Plural"
                     >
 
                     <input
-                        type="text"
                         id="example3"
+                        type="text"
                         placeholder="Beispielsatz"
                     >
 
@@ -268,26 +284,26 @@
                 <div class="word-row">
 
                     <input
-                        type="text"
                         id="german4"
+                        type="text"
                         placeholder="Deutsch"
                     >
 
                     <input
-                        type="text"
                         id="english4"
+                        type="text"
                         placeholder="English"
                     >
 
                     <input
-                        type="text"
                         id="plural4"
+                        type="text"
                         placeholder="Plural"
                     >
 
                     <input
-                        type="text"
                         id="example4"
+                        type="text"
                         placeholder="Beispielsatz"
                     >
 
@@ -300,26 +316,26 @@
                 <div class="word-row">
 
                     <input
-                        type="text"
                         id="german5"
+                        type="text"
                         placeholder="Deutsch"
                     >
 
                     <input
-                        type="text"
                         id="english5"
+                        type="text"
                         placeholder="English"
                     >
 
                     <input
-                        type="text"
                         id="plural5"
+                        type="text"
                         placeholder="Plural"
                     >
 
                     <input
-                        type="text"
                         id="example5"
+                        type="text"
                         placeholder="Beispielsatz"
                     >
 
@@ -348,7 +364,7 @@
                     class="cancel-button"
                     onclick="hideAddWords()"
                 >
-                    Abbrechen
+                    ❌ Abbrechen
                 </button>
 
             </div>
@@ -358,18 +374,19 @@
 
 
 
-        <!-- ==========================================
+        <!-- =========================================
              SEARCH
-        =========================================== -->
+        ========================================== -->
 
         <section class="search-section">
 
             <div class="search-box">
 
                 <input
-                    type="text"
+                    type="search"
                     id="search"
-                    placeholder="🔍 Suche nach Deutsch, Englisch, Plural oder Thema..."
+                    placeholder="🔍 Wort, Bedeutung, Plural oder Thema suchen..."
+                    autocomplete="off"
                 >
 
                 <button
@@ -386,15 +403,16 @@
 
 
 
-        <!-- ==========================================
-             NAVIGATION FILTERS
-        =========================================== -->
+        <!-- =========================================
+             MAIN NAVIGATION
+        ========================================== -->
 
         <section class="filters">
 
 
             <button
                 type="button"
+                class="filter-button"
                 onclick="showAll()"
             >
                 📚 Alle Wörter
@@ -403,6 +421,7 @@
 
             <button
                 type="button"
+                class="filter-button"
                 onclick="showTopics()"
             >
                 🧠 Themen
@@ -411,6 +430,7 @@
 
             <button
                 type="button"
+                class="filter-button"
                 onclick="showDays()"
             >
                 📅 Tage
@@ -421,21 +441,24 @@
 
 
 
-        <!-- ==========================================
-             STATISTICS
-        =========================================== -->
+        <!-- =========================================
+             WORD COUNT
+        ========================================== -->
 
         <section class="statistics">
 
             <div class="stat-card">
 
-                <strong id="wordCount">
+                <div
+                    id="wordCount"
+                    class="stat-number"
+                >
                     0
-                </strong>
+                </div>
 
-                <span>
+                <div class="stat-label">
                     Wörter gespeichert
-                </span>
+                </div>
 
             </div>
 
@@ -443,14 +466,9 @@
 
 
 
-        <!-- ==========================================
-             VOCABULARY AREA
-
-             IMPORTANT:
-             Initially EMPTY.
-             Words appear only after clicking:
-             Alle Wörter / Themen / Tage / Search
-        =========================================== -->
+        <!-- =========================================
+             VOCABULARY
+        ========================================== -->
 
         <section class="vocabulary-section">
 
@@ -463,18 +481,16 @@
 
 
 
-        <!-- ==========================================
+        <!-- =========================================
              NO RESULTS
-        =========================================== -->
+        ========================================== -->
 
         <div
             id="no-results"
             class="no-results"
             style="display: none;"
         >
-
             ❌ Keine Wörter gefunden.
-
         </div>
 
 
@@ -482,9 +498,9 @@
 
 
 
-    <!-- ==========================================
+    <!-- =========================================
          FOOTER
-    =========================================== -->
+    ========================================== -->
 
     <footer>
 
@@ -500,9 +516,9 @@
 
 
 
-    <!-- ==========================================
+    <!-- =========================================
          JAVASCRIPT
-    =========================================== -->
+    ========================================== -->
 
     <script src="script.js"></script>
 
