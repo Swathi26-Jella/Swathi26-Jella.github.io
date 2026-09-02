@@ -1061,7 +1061,13 @@ async function saveWords() {
                 },
 
                 body:
-                    JSON.stringify(newWords)
+                    JSON.stringify({
+
+                       action: "add",
+
+                       words: newWords
+
+                })
 
             }
         );
@@ -1264,6 +1270,12 @@ async function deleteWord(wordId) {
 
                 body:
                     JSON.stringify({
+
+                       action: "add",
+
+                       words: newWords
+
+              })
 
                         action: "delete",
 
